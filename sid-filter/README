@@ -1,0 +1,50 @@
+$Id: README,v 1.5 2008/05/14 22:26:31 msk Exp $
+
+This is the development area for Sendmail's implementation of Microsoft's
+SenderID e-mail authorization mechanism.
+
+Project lead:		n/a
+Lead engineer:		Murray S. Kucherawy <msk@sendmail.com>
+Product manager:	n/a
+
+The filter implemented here, if plugged into the Sendmail MTA, provides
+authorized sender verification as per Microsoft's SenderID specification.
+
+
+COMPILING
+=========
+
+Requires sendmail v8.13.0 or later, for required milter protocol
+enhancements.
+
+See notes in the Makefile.m4 file before compiling.
+
+
+DEBUG FEATURES
+==============
+
+The SIDDEBUG environment variable, if set, specifies debugging options to
+be applied by the filter.
+
+The contents of SIDDEBUG should be a string containing characters representing
+the required debug options as depicted in this list:
+
+(currently none)
+
+
+REJECTION LEVELS
+================
+
+Here is a representation of the decision tables used at each of the rejection
+levels ("-r" command line option).
+
+SENDER-ID	SPF	0	1	2	3	4	5
+pass		pass	accept	accept	accept	accept	accept	accept
+pass		neutral	accept	accept	accept	accept	reject	accept
+pass		fail	accept	accept	accept	accept	reject	accept
+neutral		pass	accept	accept	accept	reject	reject	accept
+neutral		neutral	accept	accept	accept	reject	reject	accept
+neutral		fail	accept	accept	accept	reject	reject	reject
+fail		pass	accept	accept	reject	reject	reject	accept
+fail		neutral	accept	accept	reject	reject	reject	reject
+fail		fail	accept	reject	reject	reject	reject	reject

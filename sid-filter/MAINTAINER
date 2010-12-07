@@ -1,0 +1,36 @@
+Maintainer(s):	Murray S. Kucherawy <msk@sendmail.com>
+
+Description:
+	sid-milter uses the Sender-ID mechanism from IETF's MARID
+	working group and SPF (Sender Policy Framework) for identifying
+	authorized senders.
+
+Active branches:
+	HEAD:			ongoing work
+
+Available tags:
+	rel-senderid-0-2-14
+	rel-senderid-0-2-13
+	rel-senderid-0-2-12
+	rel-senderid-0-2-11
+	rel-senderid-0-2-10
+	rel-senderid-0-2-9
+	rel-senderid-0-2-8
+	rel-senderid-0-2-7
+	rel-senderid-0-2-6
+	rel-senderid-0-2-5
+	rel-senderid-0-2-4
+	rel-senderid-0-2-3
+	rel-senderid-0-2-2
+	rel-senderid-0-2-1
+	rel-senderid-0-2-0
+	rel-0-1-1
+	rel-0-1-0
+
+Used by:
+	Nothing (yet).
+
+Updates:
+	Contact msk to request a new stable branch or tag.
+
+$Id: MAINTAINER,v 1.6 2008/05/13 20:34:40 msk Exp $

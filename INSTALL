@@ -1,0 +1,88 @@
+
+			Installing sid-filter
+
+COMPILING
+=========
+
+Requires sendmail v8.13.0 or later, for required milter protocol
+enhancements.
+
+To build this package you must first have installed or at least have
+available a build of libmilter.  libmilter is is part of the sendmail
+Open Source distribution and can be built and installed from there.
+
+Steps to compiling the library and the filter:
+
+(1) Download the source from Sourceforge (project name "sid-milter").
+(2) Unpack the tarball.
+(3) Change to the release directory (sid-milter-<version>).
+(4) Edit sid-filter/Makefile.m4 and follow instructions in there for
+    adjusting compile-time feature and path settings.
+(5) Type "sh Build".
+
+
+INSTALLING
+==========
+
+(1) Configure sendmail:
+  (a) Choose a socket at which the MTA and the filter will rendezvous
+      (see the documentation in libmilter for details)
+  (b) Add a line like this example to your sendmail.mc using your desired
+      socket specification:
+	INPUT_MAIL_FILTER(`sid-filter', `S=inet:8891@localhost')
+  (c) Rebuild your sendmail.cf in the usual way
+
+(2) Start sid-filter.  You will need at least the "-p" option.  The current
+    recommended set of command line options is:
+
+	-l -p SOCKETSPEC
+
+    ...where SOCKETSPEC is the socket you told sendmail to use above,
+    You can tack "-f" on there if you want it to run in the foreground
+    instead of in the background as a daemon.
+
+(7) Restart sendmail.
+
+
+TESTING
+=======
+
+With the filter installed and operating, you are now doing SenderID queries
+on arriving mail.  You should see an Authentication-Results: header added to
+all arriving mail indicating the results of the SenderID evaluation,
+with two modes: SenderID (as defined by the spec) and SPF "classic"
+(evaluating the client IP address instead of the purported responsible
+address).
+
+When testing, you should always start the filter with a "-t" flag, indicating
+the filter is in test mode and messages should always be accepted even if
+there are errors or obvious failures of arriving messages to properly
+authenticate.
+
+You should also post your own sender policy to DNS.  For instructions
+on doing so, for now you should consult http://spf.pobox.com to construct
+a policy record to publish in your DNS.  As the SenderID protocols evolve,
+this site may become obsolete; check here in future releases for a web site
+or other documentation that will remain current.
+
+
+RESOLVER
+========
+
+The basic resolver(3) facility that comes with most UNIX systems is not
+necessarily a thread-safe function, and has no capacity for enforcing
+timeouts on queries.  As a result, two simultaneous queries made by
+different threads in the filter can step on one another, or a query
+to a faraway or unavailable nameserver can take a very long time (or
+even forever) to return, eventually causing the filter to bloat up with
+threads and file descriptors that never get shut down.
+
+This package includes an asynchronous resolver library ("libar") which
+compensates for these two difficulties by ensuring the queries are both
+thread-safe and finite-timed.  This facility is enabled by default.
+If you prefer to use the OS-provided or other resolver facility,
+edit sid-filter/Makefile.m4 to disable references to libar before
+compiling the package.
+
+
+$Id: INSTALL,v 1.6 2008/05/14 20:29:40 msk Exp $

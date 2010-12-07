@@ -1,0 +1,9 @@
+# This is a "Bill Of Material" (BOM) file for use with bomco
+# Copyright (c) 2004 Sendmail, Inc.
+# $Id: Depend.bom,v 1.11 2008/05/27 16:46:19 msk Exp $
+
+devtools
+include/sm
+libsm
+libar
+libmarid

@@ -1,0 +1,177 @@
+			SID-MILTER RELEASE NOTES
+      $Id: RELEASE_NOTES,v 1.78 2008/06/07 21:10:26 msk Exp $
+
+
+This listing shows the versions of the sid-milter package, the date of
+release, and a summary of the changes in that release.
+
+1.0.0		2008/06/07
+	Update to the latest Authentication-Results header format.
+	Include SMTP AUTH status on the Sender ID Authentication-Results:
+		header field and allow authenticated mail to pass.  Based
+		on a patch from Adrian Havill.
+	Add new command line flag "-n" which suppresses use of SPF scope
+		rules while processing Sender ID.  Patch from Dick St.
+		Peters.
+	The rule processor can now return "none" as its own result.
+	The "-r" command line flag now refers to rejection "modes" instead
+		of "levels".  Also a fifth mode has been added.  Based on
+		a patch from Dick St. Peters.
+	Take advantage of some of the optimizations in milter v2, such
+		as suppressing altogether the body I/O.
+	When auto-restart is in use, have the parent wait around for the
+		child and then remove its pid file so that scripts
+		watching for termination can be properly synchronized.
+	Feature request #SF1481668: Add new command line flag "-Q" which
+		suppresses some informational logging.  Requested by
+		Steve McKenna.
+	Feature request #SF1491790: Add new command line flag "-c" which
+		continues processing a message when its PRA could not be
+		determined rather than rejecting it.
+	Feature request #SF1510079: The peerlist now handles IPv6 addresses
+		as well as negations.  Requested by Nick Sayer.
+	Feature request #SF1681069: Add new command line flag "-B" which
+		replaces NXDOMAIN replies to TXT queries with the
+		"best guess" SPF record.  See
+		http://www.openspf.org/FAQ/Best_guess_record for more
+		information.
+	Add _FFR_NH_MFROM which enables some suggested additional handling
+		of the different record types within the different scopes.
+		See the code or the FEATURES file for documentation.  Patch
+		from Dick St. Peters of NetHeaven.
+	LIBMARID: Several fixes from Dick St. Peters of NetHeaven, including
+		a fix to "redirect" parsing, tolerance of multiple records
+		when they are just different SPF versions, and addition of
+		the "mfrom" spf2.0 scope to the parser.
+	LIBMARID: Fix bug #1608836: Handle a/CIDR and mx/CIDR rules
+		correctly.  Problem noted by John Villalovos.
+
+0.2.14		2006/07/27
+	When using the stock resolver, distinguish properly between results
+		NO_DATA and HOST_NOT_FOUND.
+	Support versions of libmilter old enough that they don't have
+		smfi_insheader().
+	Feature request #SF1481666: Set an SMTP reply code when rejecting
+		or temp-failing messages.  Requested by Steve McKenna.
+	Feature request #SF1481669: Optionally syslog activity inside
+		libmarid.  Requested by Steve McKenna.
+	Feature request #SF1495205: More liberal use of smfi_setreply() to
+		pass status back up from libar and from libmarid.
+		Requested by Fredrik Pettai.
+	Feature request #SF1497799: Optionally quarantine messages instead
+		of rejecting them.  Requested by Fredrik Pettai.
+	LIBMARID: Fix handling of malformed "ip4" clauses to avoid a NULL
+		dereference.  Problem noted by Fredrik Pettai.
+
+0.2.13		2006/05/19
+	When giving up on one of several parallel DNS queries, cancel all
+		the other ones before returning.  Failing to do so can result
+		in crashes or other undesirable behaviour.  Problem noted by
+		Fredrik Pettai.
+
+0.2.12		2006/05/02
+	Send periodic milter progress messages when waiting for DNS replies.
+	LIBAR: Further fixes around retransmissions.
+
+0.2.11		2006/04/20
+	Fix bug #1379541: Remove proprietary dependencies for compiling
+		debug mode.
+	Feature request #SF1465564: Add "-H" command line option which
+		allows a name other than the hostname to be included in
+		results and identification headers.
+	Feature request #SF1465576: Add "-M" command line option which
+		allows a customizable SMTP rejection message, with a few
+		token substitutions available.
+	Feature request #SF1468334: Add "-D" command line flag to make
+		DNS errors into softfails and allow delivery rather than
+		temp-failing.
+	LIBAR: Add a timeout to the I/O wait so that retransmissions
+		actually get done while waiting for activity.
+
+0.2.10		2005/12/09
+	Fix a TXT record reassembly bug in sid_marid_check().  Based on
+		a patch by Dick St. Peters of Netheaven.
+	When reporting failures from sid_marid_check(), report what was
+		being checked.  Based on a patch from Dick St. Peters of
+		Netheaven.
+	Change the way PTR records are constructed to deal with Solaris
+		portability issues.  Reported by Fredrik Pettai.
+		(Bug SF1364413)
+	Include a policy macro expansion patch and couple of other minor
+		fixes from Dick St. Peters of Netheaven.
+	Add a new rejection option which will bounce messages for which
+		either test failed and the other did not pass.  Based on
+		a patch from Dick St. Peters of Netheaven.
+	Set the reply message to use when rejecting a message for policy
+		reasons.  Suggested by Fredrik Pettai.  (Bug SF1371268)
+	LIBAR: Fix a build issue introduced in the previous release.
+
+0.2.9		2005/07/21
+	Reset a policy string buffer before reusing it, which could lead
+		to false positives when performing multi-query evaluations.
+		(Bug SF1232318)
+	Log command line arguments at startup.  (Feature request SF1123831)
+
+0.2.8		2005/04/28
+	Better reporting of failures from libar.
+	Pay attention to the scope of the query (Sender ID vs. SPF) and
+		apply the proper policy record when more than one is
+		returned.
+	LIBMARID: Fix an off-by-one test which was messing up handling of
+		"ptr" directives in SPF records.  Patch from Manabu Kondo
+		of IIJ.
+
+0.2.7		2005/03/11
+	LIBAR: Fix up some linked list shenanigans that could cause loops
+		and other problems.
+
+0.2.6		2005/02/24
+	Further array boundary checking.  Reported by Fredrik Pettai
+		of Vattenfall.
+
+0.2.5		2005/02/07
+	Cap the number of MXes processed at MAXMXSETSZ to avoid crashes.
+		Reported by Fredrik Pettai of Vattenfall. (Bug SF1086410)
+	Construct PTR queries properly.
+	Ensure proper boundary checking when sorting the MX list.  Fix
+		from T. Kobayashi of IIJ.
+
+0.2.4		2004/12/08
+	Compilation fixes for builds not defining USE_ARLIB, from
+		Nelson S. Fung.  (Bug SF1076507)
+	Add -T command line switch to allow control over DNS timeouts.
+		Requested by Nelson S. Fung.  (Bug SF1075032)
+	Amend the Authentication-Results: header to include the PRA
+		and which header contained it.
+	Fixes to PRA selection from Steve S. Law.
+	Fix alignment problems which caused bus errors on Solaris.
+		Reported by Fredrik Pettai.
+	Portability:
+		Solaris fixes from Fredrik Pettai.
+
+0.2.3		2004/11/19
+	Make libar optional by adding support for the stock resolver.
+		(RFE SF1026229)
+	Don't use libar in TCP mode since it isn't required any more.
+	When unable to determine the Purported Responsible Address (PRA)
+		and not in test mode, bounce the message rather than
+		temp-failing it.  Requested by Henry Wong.  (RFE SF1034450)
+	LIBAR: Cope with systems that don't have MSG_WAITALL defined.
+		(RFE SF1065982)
+
+0.2.2		2004/09/11
+	Fix command line option parsing so "-r" is actually accepted.
+	Convert status reporting to use the new "Authentication-Results"
+		header format.
+
+0.2.1		2004/09/10
+	Stop temp-failing bounces just because you can't run the SPF
+		check on them.  Reported by Henry Wong.  (Bug SF1024022)
+	Allow optional rejection of message which fail one or both
+		tests.  The means for doing this right now is a command
+		line option followed by an integer, but this will likely
+		change in a later release.  Requested by Michael Teicher
+		of APlatform.  (RFE SF1024739)
+
+0.2.0		2004/08/30
+	Initial public open source release.

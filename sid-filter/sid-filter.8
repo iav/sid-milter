@@ -1,0 +1,210 @@
+.TH sid-filter 8 "Sendmail, Inc."
+.SH NAME
+.B sid-filter
+- SPF and Sender-ID filter for sendmail
+.SH SYNOPSIS
+.B sid-filter
+-p socketspec [-a peerlist] [-A] [-B] [-c] [-C cmin] [-d domains] [-D] [-f] [-h] [-H name] [-l] [-L level] [-M text] [-n] [-P pidfile] [-q] [-Q] [-r rmode] [-R rmin] [-t] [-T secs] [-u userid] [-V]
+.SH DESCRIPTION
+.B sid-filter
+implements the SPF (Sender Policy Framework) and Microsoft, Inc.'s
+Sender-ID experimental proposals for validating the sending/relaying host
+of a piece of e-mail.
+
+Details regarding the protocol and other issues related to the proposals
+can be found in RFC4406 (Sender ID) and RFC4408 (SPF).
+.SH OPTIONS
+.TP
+.I -a peerlist
+Identifies a file of "peers" which identifies clients whose connections
+should be accepted without processing by this filter.  The
+.I peerlist
+should contain on each line a hostname, domain name (e.g. ".example.com"),
+IP address, an IPv6 address (including an IPv4 mapped address), or a
+CIDR-style IP specification (e.g. "192.168.1.0/24").  An entry beginning
+with a bang ("!") character means "not", allowing exclusions of specific
+hosts that are otherwise members of larger sets.  The order of entries
+in this file is therefore significant.
+.TP
+.I -A
+Automatically re-start on failures.  Use with caution; if the filter
+fails instantly after it starts, this can cause a tight
+.I fork(2)
+loop.
+.TP
+.I -B
+Use "best-guess processing" when a domain has no published policy.
+This means a "NXDOMAIN" code returned from the nameserver will cause
+a policy of "v=spf1 a/24 mx/24 ptr ?all" to be applied on behalf of
+the purported sender of the message.
+.TP
+.I -c
+Continue processing messages when the Purported Responsible Address
+(PRA), the main parameter to Sender ID evaluations, cannot be determined.
+By default, such messages are rejected.
+.TP
+.I -C cmin
+When doing Cloudmark Rating checks, require that the reported confidence
+of the returned rating be at least 
+.I cmin
+to be meaningful.
+.TP
+.I -d domain[,...]
+A comma-separated list of domains whose mail should be ignored by this
+filter.
+.TP
+.I -D
+Treat DNS errors as soft failures and allow delivery, rather than telling the
+filter to temp-fail the message and try again later.
+.TP
+.I -f
+Normally
+.I sid-filter
+forks and exits immediately, leaving the service running in the background.
+This flag suppresses that behaviour so that it runs in the foreground.
+.TP
+.I -h
+Causes
+.I sid-filter
+to add a header indicating the presence of this filter in the path of
+the message from injection to delivery.  The product's name, version, and
+the job ID are included in the header's contents.
+.TP
+.I -H name
+Use the specified
+.I name
+when adding identifying or results headers rather than the hostname being
+used by the MTA.
+.TP
+.I -l
+Log via calls to
+.I syslog(3)
+any interesting activity.
+.TP
+.I -L level
+Request logging of libmarid activity to the
+.B syslog
+daemon at LOG_DEBUG level.  The
+.I level
+parameter refers to the log level inside libmarid, not the log level
+used by the daemon.
+.TP
+.I -M message
+Sets the SMTP rejection message to be returned by the MTA when messages
+are rejected by the filter; the text may contain tokens for
+substitution as follows:
+.I %a
+(the e-mail address which was evaluated),
+.I %e
+(the error message returned from libmarid, if any),
+.I %i
+(the IP address of the connecting client),
+.I %t
+(which test was applied, i.e. the string "Sender-ID" or the string "SPF"), and
+.I %%
+(a literal percent-sign character).
+.TP
+.I -n
+Don't use "spf1" (SPF) records for PRA (Sender-ID) scope checks.
+.TP
+.I -p socketspec
+Specifies the socket that should be established by the filter to receive
+connections from
+.I sendmail(8)
+in order to provide service.
+.I socketspec
+is in one of two forms:
+.I local:path
+which creates a UNIX domain socket at the specified
+.I path,
+or
+.I inet:port[@host]
+which creates a TCP socket on the specified
+.I port.
+If the
+.I host
+is not given as either a hostname or an IP address, the socket will be
+listening on all interfaces.  This option is mandatory.
+.TP
+.I -P pidfile
+Writes the process ID of the filter, once started, to the filename given.
+.TP
+.I -q
+Quarantine rejected messages rather than actually rejecting them.
+.TP
+.I -Q
+Quiet logging; requests that no informational messages be logged, only
+warnings and errors.
+.TP
+.I -r rmode
+Sets the rejection mode for the filter.  Valid values are: 0, which accepts
+all mail (but still adds a status header); 1, which rejects mail if both
+the Sender ID and SPF tests report "fail"; 2, which rejects mail if
+either the Sender ID or SPF test reports "fail"; 3, which rejects mail unless
+either the Sender ID or SPF test reports "pass"; 4, which rejects mail
+unless both the Sender ID and SPF tests report "pass"; or 5, which rejects
+mail for which a "fail" from either test unless a "pass" was reported by
+the other.
+The default is 0.
+.TP
+.I -R rmin
+Requests queries of the sender against the Cloudmark Rating engine, and
+reports those results in a header.  The message will be reported to "fail"
+this check unless the reported rating is at least
+.I rmin.
+See also -C.
+.TP
+.I -t
+Test mode; never reject a message, even if the responsible sender could not
+be determined.  By default, such messages are temp-failed.
+.TP
+.I -T secs
+Sets the DNS timeout in seconds.  A value of 0 causes the package to wait
+forever for DNS replies.  The default is 5.  Note that this only applies
+if the asynchronous resolver is in use; if the native resolver is used,
+no timeout facility is available.  See also the NOTES section below.
+.TP
+.I -u userid
+Attempts to be come the specified
+.I userid
+before starting operations.
+.TP
+.I -V
+Print the version number and exit without doing anything else.
+.SH OPERATION
+When a connection arrives, the headers are accepted and stored.  At the end
+of the headers, the "responsible sender" is determined based on headers
+as per the Sender-ID specification (or the envelope sender for the SPF
+evaluation).  The filter then attempts to extract an e-mail policy for the
+responsible sender domain.  When the policy has been evaluated, the
+result is relayed via the addition of an Authentication-Results: header
+field.
+.SH NOTES
+When setting timeouts (see the
+.I -T
+option above), be careful not to select a timeout value that exceeds
+the timeouts being used between
+.I sendmail
+and the filter.  Otherwise, the MTA could give up waiting for a reply
+from the filter before the filter times out waiting for a DNS result.
+.SH VERSION
+This man page covers version 1.0.0 of
+.I sid-filter.
+.SH COPYRIGHT
+Copyright (c) 2004-2006, 2008, Sendmail, Inc. and its suppliers.  All rights
+reserved.
+.SH SEE ALSO
+.I sendmail(8)
+.P
+Sendmail Operations Guide
+.P
+RFC2821 - Simple Mail Transfer Protocol
+.P
+RFC2822 - Internet Messages
+.P
+RFC4406 - Sender ID: Authenticating E-Mail
+.P
+RFC4407 - Purported Responsible Address in E-Mail Messages
+.P
+RFC4408 - Sender Policy Framework (SPF) for Authorizing Use of Domains in
+E-Mail, Version 1

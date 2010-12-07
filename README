@@ -1,0 +1,94 @@
+
+			SID-MILTER PACKAGE
+
+This directory has the latest open source Sender-ID filter software from
+Sendmail, Inc.
+
+Report any bugs to sid-milter-discuss@sourceforge.net.
+
+There is a web site at http://sourceforge.net/projects/sid-milter that is
+home for the latest updates.
+
+
++--------------+
+| INTRODUCTION |
++--------------+
+
+The sid-milter package is an open source implementation of the Sender-ID and
+SPF sender authentication systems.
+
+Sender-ID and SPF have both been published by the IETF (RFC4406 and RFC4408,
+respectively) as experimental proposals.
+
+This package consists of a library that implements the record parsers needed
+to provide the authentication service, and a milter-based filter application
+that can plug in to the sendmail MTA to provide that service to sufficiently
+recent sendmail and postfix MTAs.
+
+An optional asynchronous resolver library is also provided to work around
+limitations of the basic BIND resolver which comes installed on most
+systems.
+
+
++--------------+
+| DEPENDENCIES |
++--------------+
+
+To compile and operate, this package requires the following:
+
+o sendmail v8.13.0 (or later), and libmilter from the same distribution
+  (http://www.sendmail.org)
+
+
++-----------------------+
+| RELATED DOCUMENTATION |
++-----------------------+
+
+Documentation about Sendmail, Inc.'s sender authentication scheme testing
+program is available at http://www.sendmail.net.
+
+The man page for sid-filter (the actual filter program) is present in the
+sid-filter directory of this source distribution.
+
+
++---------------------+
+| DIRECTORY STRUCTURE |
++---------------------+
+
+devtools	m4-based build scripts and other data needed to compile
+		the package.
+
+libar		An optional thread-safe asynchronous resolver library.
+
+libmarid	A library that implements the syntax and semantics parts of
+		the proposed MARID standard for evaluating sender
+		authentication.
+
+sid-filter	A milter-based filter application which uses libmarid (and
+		optionally libar) to provide Sender-ID service via a
+		sendmail MTA and the milter protocol.
+
+
++--------------+
+| MTA TIMEOUTS |
++--------------+
+
+By default, the MTA is configured to wait up to ten seconds for a response
+from a filter before giving up.  When querying remote nameservers
+for key and policy data, the filter may not get a response from the
+resolver within that time frame, and thus this MTA timeout will occur.
+This can cause messages to be rejected, temp-failed or delivered without
+verification, depending on the failure mode selected for the filter.
+
+When using the standard resolver library provided with your system, the
+DNS timeout cannot be adjusted.  If you encounter this problem, you must
+increase the time the MTA waits for replies.  See the documentation in
+the sendmail open source distribution (libmilter/README in particular)
+for instructions on changing these timeouts.
+
+When using the provided asynchronous resolver library, you can use the
+"-T" command line option to change the timeout so that it is shorter than
+the MTA timeout.
+
+
+$Revision: 1.6 $, Last updated $Date: 2008/05/19 17:04:26 $

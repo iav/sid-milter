@@ -1,0 +1,32 @@
+
+
+	     F E A T U R E S   F O R   F U T U R E   R E L E A S E
+
+
+In the source code for this package may be one or more segments of code
+that are disabled, as they are slated for future release (FFR).  These
+are generally unreleased or incomplete features, or can be new algorithms
+for existing features.  They are often untested and currently unsupported,
+and generally formally become part of the released software in some future
+revision.  There may or may not be documentation for them outside of this
+file.  Use them at your own risk.
+
+To enable an FFR in the source code, find the feature you want to use
+in the list below and arrange to enable that feature at build time by
+adding -D_FFR_<feature-name> to the build.  For example, to add the WIDGET
+feature, you would add -D_FFR_WIDGET to the build.  You would do this
+by adding a line to Makefile.m4 that reads:
+
+	APPENDDEF(`confENVDEF', `-D_FFR_WIDGET')
+
+
+Feature Name	Description
+
+NH_MFROM	(sid-filter) From Dick St. Peters of NetHeaven:
+		This adds "spf2.0/mfrom" and "spf2.0/pra,mfrom" to the tags
+		for SPF-classic checks, and it also makes SPF-classic checks
+		ignore "spf2.0/pra" records that do not also specify "mfrom".
+
+		This extension will raise cries of anguish from some people,
+		but most domains publishing "mfrom" tags probably intend what
+		this code does.
