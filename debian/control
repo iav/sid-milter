@@ -2,7 +2,7 @@ Source: sid-milter
 Section: admin
 Priority: optional
 Maintainer: Frederic Jaeckel <frederic@soundcloud.com>
-Build-Depends: debhelper (>= 5), libmilter-dev
+Build-Depends: debhelper (>= 5), libmilter-dev, m4
 Standards-Version: 3.9.1
 
 Package: sid-milter

@@ -20,8 +20,8 @@ APPENDDEF(`confENVDEF', `-DUSE_ARLIB ')
 
 dnl Enable these next line if needed to specify the locations of libmilter.a
 dnl and the libmilter include files:
-dnl APPENDDEF(`confINCDIRS', `-I/usr/local/sendmail/include')
-dnl APPENDDEF(`confLIBDIRS', `-L/usr/local/sendmail/lib')
+APPENDDEF(`confINCDIRS', `-I/usr/include/libmilter')
+APPENDDEF(`confLIBDIRS', `-L/usr/lib/libmilter')
 
 
 bldPRODUCT_START(`executable', `sid-filter')
