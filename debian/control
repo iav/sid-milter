@@ -1,0 +1,15 @@
+Source: sid-milter
+Section: admin
+Priority: optional
+Maintainer: Frederic Jaeckel <frederic@soundcloud.com>
+Build-Depends: debhelper (>= 5), libmilter-dev
+Standards-Version: 3.9.1
+
+Package: sid-milter
+Section: admin
+Architecture: any
+Depends: ${shlibs:Depends}, libmilter, ${misc:Depends}
+Description: This package contains an Open Source plug-in, for use with 
+ Open Source or commercial sendmail MTAs, which implements and enforces the 
+ merged Caller-ID/SPF specification from the IETF MARID working group, 
+ currently dubbed "Sender-ID".
