@@ -21,12 +21,13 @@ APPENDDEF(`confENVDEF', `-DUSE_ARLIB ')
 dnl Enable these next line if needed to specify the locations of libmilter.a
 dnl and the libmilter include files:
 APPENDDEF(`confINCDIRS', `-I/usr/include/libmilter')
-APPENDDEF(`confLIBDIRS', `-L/usr/lib/libmilter')
+dnl APPENDDEF(`confLIBDIRS', `-L/usr/lib64/libmilter')
 
 
 bldPRODUCT_START(`executable', `sid-filter')
 define(`bldSOURCES', `sid-filter.c rfc2822.c util.c ')
 PREPENDDEF(`confLIBS', `-lmilter ')
+PREPENDDEF(`confLIBS', `-lresolv ')
 bldPRODUCT_END
 
 bldPRODUCT_START(`manpage', `sid-filter')
