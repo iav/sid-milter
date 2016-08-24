@@ -5,7 +5,7 @@ dnl	Place personal settings in devtools/Site/site.config.m4
 
 define(`confDEPEND_TYPE', `CC-M')
 define(`confSM_OS_HEADER', `sm_os_linux')
-define(`confMANROOT', `/usr/man/man')
+define(`confMANROOT', `/usr/share/man/man')
 define(`confLIBS', `-ldl')
 define(`confEBINDIR', `/usr/sbin')
 APPENDDEF(`confLIBSEARCH', `crypt nsl')
