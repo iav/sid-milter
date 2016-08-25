@@ -1,0 +1,15 @@
+[Unit]
+Description = SPF filter for sendmail
+After = syslog.target
+Before = sendmail.service
+Before = postfix.service
+
+[Service]
+Type = forking
+EnvironmentFile=/etc/sysconfig/sid-milter
+ExecStart = /usr/bin/sid-filter  $PORT $REJECTION $WHITELIST $OPTS
+Restart = on-failure
+PrivateTmp = true
+
+[Install]
+WantedBy = multi-user.target

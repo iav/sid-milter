@@ -1,0 +1,104 @@
+#! /bin/sh
+#
+# chkconfig: 2345 80 30
+#
+#
+# description: Start the SenderId milter daemon
+# processname: sid-filter
+# config: /etc/mail/sid-whitelist
+# pidfile: /var/run/sid-filter.pid
+### BEGIN INIT INFO
+# Provides: sid-filter
+# Default-Start:  2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: start and stop sid-filter
+# Description: milter to check spf
+### END INIT INFO
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# only local access
+#PORT="-p inet:8895@localhost"
+# accessably from network
+PORT="-p inet:8895@0.0.0.0"
+#PORT="-p local:/var/run/sid-filter/sid-filter.sock"
+REJECTION="-r 2"
+#USER="-u senderid"
+#WHITELIST="-a /etc/mail/sid-whitelist"
+PIDFILE=/var/run/sid-filter.pid
+
+
+if [ -f /etc/sysconfig/sid-filter ]
+then
+    . /etc/sysconfig/sid-filter
+fi
+SENDERID_ARGS=$" -P $PIDFILE $PORT $REJECTION $USER $WHITELIST $OPTS "
+
+RETVAL=0
+
+start() {
+
+	echo -n $"Starting sid-filter daemon: "	
+	daemon /usr/bin/sid-filter ${SENDERID_ARGS}
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/sid-filter
+	echo
+	return $RETVAL
+}
+
+stop() {
+
+	echo -n $"Stopping sid-filter daemon: "
+	killproc /usr/bin/sid-filter
+	#rm /var/run/sid-filter/sid-filter.sock
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/sid-filter
+	echo
+    return $RETVAL
+}
+
+restart() {
+	stop
+	start
+}	
+
+reload() {
+	
+	trap "" SIGHUP
+	action $"Reloading sid-filter daemon:" killall -HUP sid-filter
+	RETVAL=$?
+	return $RETVAL
+}
+
+
+case "$1" in
+start)
+	start
+	;;
+stop)
+	stop
+	;;
+reload)
+	reload
+	;;
+force-reload)
+	restart
+	;;
+restart)
+	restart
+	;;
+condrestart)
+	if [ -f /var/lock/subsys/sid-filter ]; then
+	    restart
+	fi
+	;;
+status)
+	status sid-filter
+	RETVAL=$?
+	;;
+*)
+	echo $"Usage: $0 {start|stop|status|restart}"
+	RETVAL=2
+esac
+
+exit $RETVAL

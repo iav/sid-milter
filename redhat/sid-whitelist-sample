@@ -1,0 +1,7 @@
+# add there whitelisted network
+# and pass filename to daemon with "-a" switch:
+# -a /etc/mail/sid-whitelist
+
+# commented out string
+#10.10.1.0/24
+192.168.1.0/24
