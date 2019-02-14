@@ -25,14 +25,14 @@ PORT="-p inet:8895@0.0.0.0"
 REJECTION="-r 2"
 #USER="-u senderid"
 #WHITELIST="-a /etc/mail/sid-whitelist"
-PIDFILE=/var/run/sid-filter.pid
+PIDFILE="-P /var/run/sid-filter.pid"
 
 
 if [ -f /etc/sysconfig/sid-filter ]
 then
     . /etc/sysconfig/sid-filter
 fi
-SENDERID_ARGS=$" -P $PIDFILE $PORT $REJECTION $USER $WHITELIST $OPTS "
+SENDERID_ARGS=$" $PIDFILE $PORT $USER $REJECTION $WHITELIST_NETS $WHITELIST_DOMAINS $OPTS "
 
 RETVAL=0
 

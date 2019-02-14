@@ -6,8 +6,8 @@ Before = postfix.service
 
 [Service]
 Type = forking
-EnvironmentFile=/etc/sysconfig/sid-milter
-ExecStart = /usr/bin/sid-filter  $PORT $REJECTION $WHITELIST $OPTS
+EnvironmentFile=/etc/sysconfig/sid-filter
+ExecStart=/usr/bin/sid-filter $PIDFILE $PORT $USER $REJECTION $WHITELIST_NETS $WHITELIST_DOMAINS $OPTS
 Restart = on-failure
 PrivateTmp = true
 

@@ -70,10 +70,10 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC"; export CFLAGS
 
 %if %{use_systemd}
 	%{__install} -d -m 755 %{buildroot}%{_unitdir}
-	%{__install} -D -p -m 0644 %{_builddir}/%buildsubdir/redhat/sid-milter.systemd.service %{buildroot}%{_unitdir}/%{name}.service
-	%{__install} -D -p -m 0644 %{_builddir}/%buildsubdir/redhat/sid-milter.env %{buildroot}%{_sysconfdir}/sysconfig/%{name}
+	%{__install} -D -p -m 0644 %{_builddir}/%buildsubdir/redhat/sid-filter.systemd.service %{buildroot}%{_unitdir}/%{name}.service
+	%{__install} -D -p -m 0644 %{_builddir}/%buildsubdir/redhat/sid-filter.env %{buildroot}%{_sysconfdir}/sysconfig/%{name}
 %else
-	%{__install} -D -p -m 0644 %{_builddir}/%buildsubdir/redhat/sid-milter.env %{buildroot}%{_sysconfdir}/sysconfig/%{binname}
+	%{__install} -D -p -m 0644 %{_builddir}/%buildsubdir/redhat/sid-filter.env %{buildroot}%{_sysconfdir}/sysconfig/%{binname}
 	%{__install} -D -p -m  755 %{_builddir}/%buildsubdir/redhat/sid-filter.rc  %{buildroot}%{_initrddir}/%{binname}
 	touch %{buildroot}%{rundir}/%{binname}.pid
 %endif
@@ -93,7 +93,7 @@ if [ $1 -eq 1 ]; then
 		/sbin/chkconfig --add %{binname} || :
 	%endif
 	%if 0%{?fedora} >= 18 || 0%{?rhel} >= 7
-		/bin/systemctl preset milter-greylist.service >/dev/null 2>&1 || :
+		/bin/systemctl preset %{name}.service >/dev/null 2>&1 || :
 	%endif
 	
 fi
